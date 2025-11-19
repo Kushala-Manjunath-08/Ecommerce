@@ -1,0 +1,16 @@
+from pathlib import Path
+import sqlite3
+import pandas as pd
+
+query = Path('output.sql').read_text(encoding='utf-8')
+
+db_path = Path('ecommerce.db')
+if not db_path.exists():
+    raise FileNotFoundError(f'Database not found: {db_path.resolve()}')
+
+with sqlite3.connect(db_path) as conn:
+    df = pd.read_sql_query(query, conn)
+
+output_path = Path('order_report.csv')
+df.to_csv(output_path, index=False)
+print(f'Report saved to {output_path.resolve()}')

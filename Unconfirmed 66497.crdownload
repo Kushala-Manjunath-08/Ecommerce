@@ -1,0 +1,27 @@
+import sqlite3
+from pathlib import Path
+
+import pandas as pd
+
+DATA_DIR = Path('data')
+DB_PATH = Path('ecommerce.db')
+TABLE_FILES = {
+    'customers': 'customers.csv',
+    'products': 'products.csv',
+    'orders': 'orders.csv',
+    'order_items': 'order_items.csv',
+    'payments': 'payments.csv',
+}
+
+if not DATA_DIR.exists():
+    raise FileNotFoundError(f'Data directory not found: {DATA_DIR.resolve()}')
+
+with sqlite3.connect(DB_PATH) as conn:
+    for table, filename in TABLE_FILES.items():
+        csv_path = DATA_DIR / filename
+        if not csv_path.exists():
+            raise FileNotFoundError(f'Missing CSV for table {table}: {csv_path.resolve()}')
+        df = pd.read_csv(csv_path)
+        df.to_sql(table, conn, if_exists='replace', index=False)
+
+print('Data Ingested Successfully')

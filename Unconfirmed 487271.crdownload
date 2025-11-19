@@ -1,0 +1,16 @@
+from pathlib import Path
+import sqlite3
+
+query = Path('output.sql').read_text(encoding='utf-8')
+
+with sqlite3.connect('ecommerce.db') as conn:
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(query).fetchall()
+
+if not rows:
+    print('No rows returned.')
+else:
+    headers = rows[0].keys()
+    print('\t'.join(headers))
+    for row in rows:
+        print('\t'.join(str(row[h]) for h in headers))
